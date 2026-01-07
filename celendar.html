@@ -34,8 +34,8 @@
       --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1);
       --shadow-2xl: 0 24px 64px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.15);
       --gradient-mesh: radial-gradient(at 40% 20%, hsla(217, 100%, 70%, 0.3) 0px, transparent 50%),
-                       radial-gradient(at 80% 0%, hsla(189, 100%, 70%, 0.3) 0px, transparent 50%),
-                       radial-gradient(at 0% 50%, hsla(355, 100%, 85%, 0.3) 0px, transparent 50%);
+        radial-gradient(at 80% 0%, hsla(189, 100%, 70%, 0.3) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, hsla(355, 100%, 85%, 0.3) 0px, transparent 50%);
     }
 
     body.dark-mode {
@@ -89,116 +89,21 @@
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
 
 
-
-    /* Dynamic Sidebar */
-    .sidebar {
-      width: var(--sidebar-width-collapsed);
-      height: 100vh;
-      background-color: var(--bg-card);
-      border-right: 1px solid var(--border);
-      position: fixed;
-      left: 0;
-      top: 0;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 16px;
-      z-index: 1000;
-      overflow: hidden;
-      white-space: nowrap;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .sidebar:hover {
-      width: var(--sidebar-width-expanded);
-      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
-      padding: 24px;
-    }
-
-    .brand {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 40px;
-      text-decoration: none;
-      height: 40px;
-    }
-
-    .brand i {
-      font-size: 1.5rem;
-      min-width: 24px;
-      text-align: center;
-    }
-
-    .brand span {
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .sidebar:hover .brand span {
-      opacity: 1;
-    }
-
-    .nav-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex: 1;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 12px;
-      color: var(--text-secondary);
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      justify-content: flex-start;
-      height: 48px;
-    }
-
-    .nav-item:hover,
-    .nav-item.active {
-      background-color: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .nav-item i {
-      font-size: 1.25rem;
-      min-width: 24px;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-    }
-
-    .nav-item span {
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .sidebar:hover .nav-item span {
-      opacity: 1;
-    }
-
-    .sidebar-footer {
-      border-top: 1px solid var(--border);
-      padding-top: 20px;
-      margin-top: auto;
-    }
 
     /* Main Content */
     .content {
-      margin-left: var(--sidebar-width-collapsed);
       flex: 1;
       padding: 40px;
       max-width: 1400px;
@@ -370,7 +275,7 @@
       color: #ef4444;
     }
   </style>
-    <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/sidebar.css">
   <link rel="stylesheet" href="css/mobile-responsive.css">
 </head>
 
@@ -432,20 +337,22 @@
           <button id="nextMonth" class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-right"></i></button>
         </div>
 
-        <table class="calendar-table">
-          <thead>
-            <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
-            </tr>
-          </thead>
-          <tbody id="calendarBody"></tbody>
-        </table>
+        <div class="calendar-table-wrapper">
+          <table class="calendar-table">
+            <thead>
+              <tr>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+              </tr>
+            </thead>
+            <tbody id="calendarBody"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Right: Tasks & Events -->
@@ -596,7 +503,7 @@
 
     function showProfile() { alert('Profile Settings'); }
 
-        // Theme management is now handled by theme-manager.js
+    // Theme management is now handled by theme-manager.js
   </script>
 
   <!-- Firebase -->

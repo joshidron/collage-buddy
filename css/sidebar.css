@@ -161,7 +161,11 @@
     }
 
     .sidebar-footer {
-        display: none;
+        display: flex;
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+        align-items: center;
     }
 }
 
