@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <title>Study Buddy - Collaboration</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      /* Light Mode Variables */
+      --bg-body: #FAFAFA;
+      --bg-card: #FFFFFF;
+      --text-primary: #0F172A;
+      --text-secondary: #64748B;
+      --accent: #2563EB;
+      --accent-light: #EFF6FF;
+      --success: #10B981;
+      --border: #E2E8F0;
+
+      /* Sidebar Variables */
+      --sidebar-width-collapsed: 80px;
+      --sidebar-width-expanded: 260px;
+
+      /* 3D Effects */
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-blur: 20px;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1);
+      --shadow-2xl: 0 24px 64px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.15);
+      --gradient-mesh: radial-gradient(at 40% 20%, hsla(217, 100%, 70%, 0.3) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, hsla(189, 100%, 70%, 0.3) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, hsla(355, 100%, 85%, 0.3) 0px, transparent 50%);
+    }
+
+    body.dark-mode {
+      /* Dark Mode Variables */
+      --bg-body: #0F172A;
+      --bg-card: #1E293B;
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --accent-light: #334155;
+      --border: #334155;
+      /* 3D Effects - Dark Mode */
+      --glass-bg: rgba(30, 41, 59, 0.5);
+      --glass-border: rgba(148, 163, 184, 0.2);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.4);
+      --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7), 0 8px 24px rgba(0, 0, 0, 0.5);
+      --shadow-2xl: 0 24px 64px rgba(0, 0, 0, 0.8), 0 12px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background: var(--bg-body);
+      background-image: var(--gradient-mesh);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+    }
+
+    /* 3D Utility Classes */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-lg);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hover-3d {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    .hover-3d:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--shadow-2xl);
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    /* Dynamic Sidebar */
+    .sidebar {
+      width: var(--sidebar-width-collapsed);
+      height: 100vh;
+      background-color: var(--bg-card);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      z-index: 1000;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar:hover {
+      width: var(--sidebar-width-expanded);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+    }
+
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+      text-decoration: none;
+      height: 40px;
+    }
+
+    .brand i {
+      font-size: 1.5rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .brand span {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar:hover .brand span {
+      opacity: 1;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      justify-content: flex-start;
+      height: 48px;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background-color: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .nav-item i {
+      font-size: 1.25rem;
+      min-width: 24px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+    }
+
+    .nav-item span {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar:hover .nav-item span {
+      opacity: 1;
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      margin-top: auto;
+    }
+
+    /* Main Content */
+    .content {
+      margin-left: var(--sidebar-width-collapsed);
+      flex: 1;
+      padding: 40px;
+      max-width: 1400px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-header h2 {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-size: 1.8rem;
+    }
+
+    .page-header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    /* Tabs Styling */
+    .nav-tabs {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-tabs .nav-link {
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 0.75rem 1.25rem;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--accent);
+      border-color: transparent;
+    }
+
+    .nav-tabs .nav-link.active {
+      color: var(--accent);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    /* Form Controls */
+    .form-control {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .form-control:focus {
+      background-color: var(--bg-card);
+      border-color: var(--accent);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
+    }
+
+    /* Modal Styling */
+    .modal-content {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-close {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    body.dark-mode .btn-close {
+      filter: none;
+    }
+
+    /* Button Styling */
+    .btn-primary {
+      background-color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background-color: var(--text-secondary);
+      border-color: var(--text-secondary);
+    }
+
+    /* Alert Styling */
+    .alert {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .alert-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #10b981;
+    }
+
+    .alert-warning {
+      background-color: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #f59e0b;
+    }
+
+    .alert-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .alert-info {
+      background-color: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #3b82f6;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Dynamic Sidebar -->
+  <aside class="sidebar">
+    <a href="index.html" class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>Study Buddy</span>
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html" class="nav-item">
+        <i class="fas fa-home"></i> <span>Dashboard</span>
+      </a>
+      <a href="courses.html" class="nav-item">
+        <i class="fas fa-book"></i> <span>Courses</span>
+      </a>
+      <a href="collab.html" class="nav-item active">
+        <i class="fas fa-users"></i> <span>Collaboration</span>
+      </a>
+      <a href="celendar.html" class="nav-item">
+        <i class="fas fa-calendar"></i> <span>Calendar</span>
+      </a>
+      <a href="todo.html" class="nav-item">
+        <i class="fas fa-check-square"></i> <span>Task Board</span>
+      </a>
+      <a href="interview.html" class="nav-item"> <i class="fas fa-user-tie"></i> <span>Interview</span> </a>
+      <a href="resources.html" class="nav-item"> <i class="fas fa-folder-open"></i> <span>Resources</span> </a>
+    </nav>
+    <div class="sidebar-footer">
+      <nav class="nav-menu">
+        <a href="#" class="nav-item" onclick="toggleTheme()">
+          <i class="fas fa-moon" id="theme-icon"></i>
+          <span>Wait/Dark</span>
+        </a>
+        <a href="about.html" class="nav-item">
+          <i class="fas fa-info-circle"></i> <span>About Us</span>
+        </a>
+        <a href="profile.html" class="nav-item" id="account-link">
+          <i class="fas fa-user-circle"></i> <span>Account</span>
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <!-- Main Content -->
+    <div id="collab-content">
+      <div class="page-header" style="margin-bottom: 30px;">
+        <h2>Collaboration Hub</h2>
+        <p>Connect with friends, create study groups, and collaborate together.</p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <ul class="nav nav-tabs mb-4" id="collabTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="friends-tab" data-bs-toggle="tab" data-bs-target="#friends" type="button">
+            <i class="fas fa-user-friends me-2"></i>Friends
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups" type="button">
+            <i class="fas fa-users me-2"></i>Groups
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="invitations-tab" data-bs-toggle="tab" data-bs-target="#invitations"
+            type="button">
+            <i class="fas fa-envelope me-2"></i>Invitations
+            <span class="badge bg-danger ms-2" id="invitation-count" style="display: none;">0</span>
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content" id="collabTabContent">
+        <!-- Friends Tab -->
+        <div class="tab-pane fade show active" id="friends" role="tabpanel">
+          <!-- Search Friends -->
+          <div class="glass-card" style="padding: 24px; margin-bottom: 24px;">
+            <h5 class="mb-3"><i class="fas fa-search me-2"></i>Find Friends</h5>
+            <div class="row g-3">
+              <div class="col-md-8">
+                <input type="email" class="form-control" id="friend-email-search"
+                  placeholder="Enter friend's email address">
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-primary w-100" onclick="searchAndSendRequest()">
+                  <i class="fas fa-user-plus me-2"></i>Send Request
+                </button>
+              </div>
+            </div>
+            <div id="search-result" class="mt-3"></div>
+          </div>
+
+          <!-- Friends List -->
+          <div class="glass-card" style="padding: 24px;">
+            <h5 class="mb-3"><i class="fas fa-user-friends me-2"></i>My Friends</h5>
+            <div id="friends-list" class="row g-3">
+              <!-- Friends will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Groups Tab -->
+        <div class="tab-pane fade" id="groups" role="tabpanel">
+          <!-- Create Group Button -->
+          <div class="mb-4">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+              <i class="fas fa-plus-circle me-2"></i>Create New Group
+            </button>
+          </div>
+
+          <!-- My Groups -->
+          <div class="glass-card" style="padding: 24px;">
+            <h5 class="mb-3"><i class="fas fa-users me-2"></i>My Study Groups</h5>
+            <div id="groups-list" class="row g-3">
+              <!-- Groups will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Invitations Tab -->
+        <div class="tab-pane fade" id="invitations" role="tabpanel">
+          <!-- Friend Requests -->
+          <div class="glass-card" style="padding: 24px; margin-bottom: 24px;">
+            <h5 class="mb-3"><i class="fas fa-user-plus me-2"></i>Friend Requests</h5>
+            <div id="friend-requests-list">
+              <!-- Friend requests will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Group Invitations -->
+          <div class="glass-card" style="padding: 24px;">
+            <h5 class="mb-3"><i class="fas fa-users me-2"></i>Group Invitations</h5>
+            <div id="group-invitations-list">
+              <!-- Group invitations will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Group Modal -->
+  <div class="modal fade" id="createGroupModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-users me-2"></i>Create Study Group</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Group Name</label>
+            <input type="text" class="form-control" id="group-name" placeholder="e.g., CS101 Study Group">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" id="group-description" rows="3"
+              placeholder="What is this group about?"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="handleCreateGroup()">
+            <i class="fas fa-check me-2"></i>Create Group
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/theme-manager.js"></script>
+
+  <script>
+    // Initialize Firebase (Add your own config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD7aQk3I8Z1Q4b2fKqK7q8Z2JkLmNpOqRSt",
+      authDomain: "study-buddy-demo.firebaseapp.com",
+      projectId: "study-buddy-demo",
+      storageBucket: "study-buddy-demo.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdef123456"
+    };
+
+    // Initialize Firebase if not already initialized
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    // Theme management is now handled by theme-manager.js
+
+    // In-memory database for demo
+    const demoDatabase = {
+      users: [
+        { id: '1', email: 'alex@example.com', displayName: 'Alex Johnson', status: 'Online' },
+        { id: '2', email: 'sam@example.com', displayName: 'Sam Wilson', status: 'Offline' },
+        { id: '3', email: 'taylor@example.com', displayName: 'Taylor Swift', status: 'Online' },
+        { id: '4', email: 'chris@example.com', displayName: 'Chris Evans', status: 'Online' },
+        { id: '5', email: 'test@example.com', displayName: 'Test User', status: 'Online' }
+      ],
+      friends: [
+        { id: '1', userId: 'current', friendId: '1', status: 'accepted' },
+        { id: '2', userId: 'current', friendId: '2', status: 'accepted' }
+      ],
+      friendRequests: [
+        {
+          id: '1',
+          from: '4',
+          fromName: 'Chris Evans',
+          to: 'current',
+          timestamp: new Date('2024-03-10'),
+          status: 'pending'
+        }
+      ],
+      groups: [
+        {
+          id: '1',
+          name: 'CS101 Study Group',
+          description: 'Introduction to Computer Science',
+          members: ['current', '1', '2'],
+          createdAt: new Date('2024-01-15')
+        },
+        {
+          id: '2',
+          name: 'Math Study Group',
+          description: 'Calculus and Linear Algebra',
+          members: ['current', '3'],
+          createdAt: new Date('2024-02-01')
+        }
+      ]
+    };
+
+    // Current user (for demo)
+    const currentUser = {
+      id: 'current',
+      email: 'me@example.com',
+      displayName: 'Current User'
+    };
+
+    // Check Local Storage on Load
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialize sample data
+      initializeSampleData();
+    });
+
+    // Initialize and display data
+    function initializeSampleData() {
+      // Get current user's friends
+      const myFriends = demoDatabase.friends
+        .filter(f => f.userId === 'current' && f.status === 'accepted')
+        .map(f => {
+          const friend = demoDatabase.users.find(u => u.id === f.friendId);
+          return friend;
+        });
+
+      // Get current user's groups
+      const myGroups = demoDatabase.groups
+        .filter(g => g.members.includes('current'))
+        .map(g => ({
+          ...g,
+          members: g.members.length
+        }));
+
+      // Get friend requests sent to current user
+      const myFriendRequests = demoDatabase.friendRequests
+        .filter(r => r.to === 'current' && r.status === 'pending');
+
+      // Display data
+      displayFriends(myFriends);
+      displayGroups(myGroups);
+      displayFriendRequests(myFriendRequests);
+
+      // Show invitation count
+      const totalInvitations = myFriendRequests.length;
+      if (totalInvitations > 0) {
+        document.getElementById('invitation-count').style.display = 'inline-block';
+        document.getElementById('invitation-count').textContent = totalInvitations;
+      }
+    }
+
+    // Search and send friend request
+    async function searchAndSendRequest() {
+      const email = document.getElementById('friend-email-search').value.trim().toLowerCase();
+      const resultDiv = document.getElementById('search-result');
+
+      if (!email) {
+        showAlert(resultDiv, 'Please enter an email address', 'warning');
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showAlert(resultDiv, 'Please enter a valid email address', 'warning');
+        return;
+      }
+
+      // Check if email is the current user's email
+      if (email === currentUser.email) {
+        showAlert(resultDiv, 'You cannot send a friend request to yourself', 'warning');
+        return;
+      }
+
+      // Show loading
+      showAlert(resultDiv, 'Searching for user...', 'info');
+
+      // Simulate API call delay
+      setTimeout(() => {
+        // Find user by email
+        const user = demoDatabase.users.find(u => u.email.toLowerCase() === email);
+
+        if (!user) {
+          showAlert(resultDiv, `User with email ${email} not found`, 'danger');
+          return;
+        }
+
+        // Check if already friends
+        const alreadyFriends = demoDatabase.friends.some(f =>
+          f.userId === 'current' && f.friendId === user.id && f.status === 'accepted'
+        );
+
+        if (alreadyFriends) {
+          showAlert(resultDiv, `You are already friends with ${user.displayName}`, 'info');
+          return;
+        }
+
+        // Check if request already sent
+        const requestExists = demoDatabase.friendRequests.some(r =>
+          (r.from === 'current' && r.to === user.id && r.status === 'pending') ||
+          (r.from === user.id && r.to === 'current' && r.status === 'pending')
+        );
+
+        if (requestExists) {
+          showAlert(resultDiv, `Friend request already sent to ${user.displayName}`, 'info');
+          return;
+        }
+
+        // Create friend request
+        const newRequest = {
+          id: Date.now().toString(),
+          from: 'current',
+          fromName: currentUser.displayName,
+          to: user.id,
+          toEmail: user.email,
+          timestamp: new Date(),
+          status: 'pending'
+        };
+
+        // Add to database
+        demoDatabase.friendRequests.push(newRequest);
+
+        // Show success message with more details
+        showAlert(resultDiv,
+          `✅ Friend request sent to ${user.displayName} (${user.email})! 
+          <br><small>They will see your request in their invitations tab.</small>`,
+          'success');
+
+        // Clear input
+        document.getElementById('friend-email-search').value = '';
+
+        // Optional: Log the request for debugging
+        console.log('Friend request sent:', newRequest);
+        console.log('All friend requests:', demoDatabase.friendRequests);
+
+      }, 1000);
+    }
+
+    // Display functions
+    function displayFriends(friends) {
+      const container = document.getElementById('friends-list');
+
+      if (!friends || friends.length === 0) {
+        container.innerHTML = `
+          <div class="col-12 text-center text-muted">
+            <i class="fas fa-users" style="font-size: 3rem; opacity: 0.3;"></i>
+            <p class="mt-2">No friends yet. Search and add friends above!</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = friends.map(friend => `
+          <div class="col-md-6 col-lg-4">
+            <div class="card glass-card hover-3d">
+              <div class="card-body text-center">
+                <i class="fas fa-user-circle" style="font-size: 3rem; color: var(--accent);"></i>
+                <h6 class="mt-2 mb-1">${friend.displayName}</h6>
+                <small class="text-muted">${friend.email}</small>
+                <div class="mt-2">
+                  <span class="badge ${friend.status === 'Online' ? 'bg-success' : 'bg-secondary'}">
+                    ${friend.status}
+                  </span>
+                </div>
+                <div class="mt-3">
+                  <button class="btn btn-sm btn-outline-primary me-2" onclick="messageFriend('${friend.id}')">
+                    <i class="fas fa-comment"></i> Message
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="removeFriend('${friend.id}')">
+                    <i class="fas fa-user-minus"></i> Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function displayGroups(groups) {
+      const container = document.getElementById('groups-list');
+
+      if (!groups || groups.length === 0) {
+        container.innerHTML = `
+          <div class="col-12 text-center text-muted">
+            <i class="fas fa-users-cog" style="font-size: 3rem; opacity: 0.3;"></i>
+            <p class="mt-2">No groups yet. Create your first study group!</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = groups.map(group => `
+          <div class="col-md-6 col-lg-4">
+            <div class="card glass-card hover-3d">
+              <div class="card-body">
+                <h6 class="mb-2"><i class="fas fa-users me-2"></i>${group.name}</h6>
+                <p class="text-muted small mb-2">${group.description}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small><i class="fas fa-user me-1"></i>${group.members} members</small>
+                  <small class="text-muted">${group.createdAt.toLocaleDateString()}</small>
+                </div>
+                <div class="mt-3">
+                  <button class="btn btn-sm btn-outline-primary w-100" onclick="viewGroup('${group.id}')">
+                    <i class="fas fa-door-open me-1"></i> Enter Group
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function displayFriendRequests(requests) {
+      const container = document.getElementById('friend-requests-list');
+
+      if (!requests || requests.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-muted">
+            <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+            <p class="mt-2">No pending friend requests</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = requests.map(req => `
+          <div class="card mb-2 glass-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">${req.fromName}</h6>
+                  <small class="text-muted">Sent ${req.timestamp.toLocaleDateString()}</small>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-success me-2" onclick="acceptRequest('${req.id}')">
+                    <i class="fas fa-check"></i> Accept
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="rejectRequest('${req.id}')">
+                    <i class="fas fa-times"></i> Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Create group
+    async function handleCreateGroup() {
+      const name = document.getElementById('group-name').value.trim();
+      const description = document.getElementById('group-description').value.trim();
+
+      if (!name) {
+        alert('Please enter a group name');
+        return;
+      }
+
+      // Create new group
+      const newGroup = {
+        id: Date.now().toString(),
+        name: name,
+        description: description,
+        members: ['current'],
+        createdAt: new Date()
+      };
+
+      // Add to database
+      demoDatabase.groups.push(newGroup);
+
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('createGroupModal'));
+      modal.hide();
+
+      // Clear form
+      document.getElementById('group-name').value = '';
+      document.getElementById('group-description').value = '';
+
+      // Show success message
+      showAlert(document.getElementById('search-result'),
+        `✅ Group "${name}" created successfully!`, 'success');
+
+      // Reload groups
+      initializeSampleData();
+    }
+
+    // Utility functions
+    function showAlert(container, message, type = 'info') {
+      const alertClass = `alert-${type}`;
+      container.innerHTML = `
+        <div class="alert ${alertClass}">
+          <i class="fas fa-${getIconForType(type)} me-2"></i>
+          ${message}
+        </div>
+      `;
+    }
+
+    function getIconForType(type) {
+      switch (type) {
+        case 'success': return 'check-circle';
+        case 'warning': return 'exclamation-triangle';
+        case 'danger': return 'times-circle';
+        case 'info': return 'info-circle';
+        default: return 'info-circle';
+      }
+    }
+
+    function acceptRequest(requestId) {
+      const request = demoDatabase.friendRequests.find(r => r.id === requestId);
+      if (!request) return;
+
+      // Update request status
+      request.status = 'accepted';
+
+      // Add friendship to database
+      demoDatabase.friends.push({
+        id: Date.now().toString(),
+        userId: 'current',
+        friendId: request.from,
+        status: 'accepted'
+      });
+
+      // Show notification
+      showAlert(document.getElementById('search-result'),
+        `✅ You are now friends with ${request.fromName}!`, 'success');
+
+      // Remove from UI
+      document.querySelector(`button[onclick="acceptRequest('${requestId}')]`).closest('.card').remove();
+
+      // Update invitation count
+      updateInvitationCount();
+
+      // Reload friends list
+      initializeSampleData();
+    }
+
+    function rejectRequest(requestId) {
+      const request = demoDatabase.friendRequests.find(r => r.id === requestId);
+      if (!request) return;
+
+      // Update request status
+      request.status = 'rejected';
+
+      // Remove from UI
+      document.querySelector(`button[onclick="rejectRequest('${requestId}')]`).closest('.card').remove();
+
+      // Update invitation count
+      updateInvitationCount();
+
+      showAlert(document.getElementById('search-result'),
+        `Friend request from ${request.fromName} rejected`, 'info');
+    }
+
+    function updateInvitationCount() {
+      const pendingRequests = demoDatabase.friendRequests.filter(r =>
+        r.to === 'current' && r.status === 'pending'
+      );
+
+      const badge = document.getElementById('invitation-count');
+      if (pendingRequests.length > 0) {
+        badge.style.display = 'inline-block';
+        badge.textContent = pendingRequests.length;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function viewGroup(groupId) {
+      const group = demoDatabase.groups.find(g => g.id === groupId);
+      if (group) {
+        alert(`Entering group: ${group.name}\n\nDescription: ${group.description}\nMembers: ${group.members.length}`);
+      }
+    }
+
+    function messageFriend(friendId) {
+      const friend = demoDatabase.users.find(u => u.id === friendId);
+      if (friend) {
+        alert(`Opening chat with ${friend.displayName}...\n\nFeature coming soon!`);
+      }
+    }
+
+    function removeFriend(friendId) {
+      if (confirm('Are you sure you want to remove this friend?')) {
+        // Remove friendship from database
+        demoDatabase.friends = demoDatabase.friends.filter(f =>
+          !(f.userId === 'current' && f.friendId === friendId)
+        );
+
+        // Reload friends list
+        initializeSampleData();
+
+        showAlert(document.getElementById('search-result'),
+          'Friend removed successfully', 'info');
+      }
+    }
+  </script>
+</body>
+
+</html>
