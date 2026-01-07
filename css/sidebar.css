@@ -8,7 +8,7 @@
 /* Dynamic Sidebar */
 .sidebar {
     width: var(--sidebar-width-collapsed);
-    height: 100vh;
+    height: 85vh;
     background-color: var(--bg-card);
     border-right: 1px solid var(--border);
     position: fixed;
