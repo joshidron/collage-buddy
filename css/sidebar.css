@@ -5,9 +5,6 @@
     --sidebar-width-expanded: 260px;
 }
 
-html{
-    zoom: 0.85;
-}
 /* Dynamic Sidebar */
 .sidebar {
     width: var(--sidebar-width-collapsed);
