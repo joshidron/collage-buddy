@@ -5,10 +5,13 @@
     --sidebar-width-expanded: 260px;
 }
 
+html{
+    zoom: 0.85;
+}
 /* Dynamic Sidebar */
 .sidebar {
     width: var(--sidebar-width-collapsed);
-    height: 85vh;
+    height: 100vh;
     background-color: var(--bg-card);
     border-right: 1px solid var(--border);
     position: fixed;
